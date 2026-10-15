@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#e8f2e7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>FODMAP Friend</title>
+<style>
+:root{--green:#28613a;--pale:#e8f2e7;--ink:#203126;--muted:#637268;--line:#dce5dd;--card:#fff;--amber:#fff0c9;--red:#f8dada}
+*{box-sizing:border-box}body{margin:0;background:#f6f8f5;color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:auto;padding:18px}.hero{background:var(--pale);border-radius:22px;padding:22px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:12px}.leaf{font-size:36px}.brand h1{font-size:25px;margin:0}.brand p{margin:2px 0 0;color:#42674a;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 2px 8px #20312608}
+h2{font-size:19px;margin:0 0 12px}h3{font-size:15px;margin:14px 0 6px}p{margin:8px 0}.muted{color:var(--muted);font-size:13px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1 1 130px}
+input,textarea{width:100%;border:1px solid #cbd7cc;border-radius:11px;padding:12px;font:inherit;background:white;color:var(--ink);margin:4px 0 8px}
+button,.linkbtn{border:0;border-radius:11px;padding:11px 14px;font:600 14px system-ui;cursor:pointer;background:var(--green);color:white;text-align:center;text-decoration:none;display:inline-block}
+.secondary{background:white;color:var(--ink);border:1px solid var(--line)}button:disabled{opacity:.5}
+.hidden{display:none!important}.status{font-size:13px;color:var(--muted);margin-top:10px;min-height:20px}
+.result{padding:14px;border-radius:12px;margin:12px 0;color:#242424}.green{background:#d9f1df}.amber{background:var(--amber)}.red{background:var(--red)}.gray{background:#ecefed}
+.tag{font-size:12px;padding:4px 8px;border-radius:20px;background:#edf1ed;display:inline-block}
+.product{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;text-align:left;width:100%;background:#fff;color:var(--ink);display:block}
+.product img{width:55px;height:55px;object-fit:contain;float:left;margin-right:10px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 2px}
+.pill{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-weight:500;font-size:13px}
+.pill:hover{background:var(--pale)}
+.badge{font-size:11px;padding:2px 7px;border-radius:10px;background:#e3ebf5;color:#26405f;margin-left:6px;font-weight:600;vertical-align:middle}
+.badge.guide{background:#e8f2e7;color:#205c35}
+.notice{background:#eef3fb;border:1px solid #d3e0f3;color:#26405f;border-radius:12px;padding:10px 12px;font-size:13px;margin:10px 0}
+mark.hl{border-radius:4px;padding:0 2px;color:inherit}mark.hl-amber{background:#ffe08a}mark.hl-red{background:#f5b0b0}
+.grp{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;margin:6px 0;color:#242424}
+.grp b{display:block;font-size:15px}.grp small{display:block;font-size:12px;opacity:.75}.grp .st{font-weight:700;font-size:13px;text-align:right;white-space:nowrap}
+.grp .why{font-size:12px;opacity:.85;text-align:right}
+.noing{font-size:11px;color:var(--muted);margin-left:6px}
+.product.lvl-green{border-left:6px solid #7cc58f}.product.lvl-amber{border-left:6px solid #f0c24a}.product.lvl-red{border-left:6px solid #e08a8a}.product.lvl-gray{border-left:6px solid #c9d0cb}
+details summary{cursor:pointer;font-weight:600}
+details{margin:6px 0}
+.checks{display:flex;gap:8px 16px;flex-wrap:wrap;margin-top:8px}
+.checks label{display:flex;align-items:center;gap:6px;font-size:14px}
+.checks input{width:auto;margin:0}
+button,.pill{min-height:44px;-webkit-tap-highlight-color:transparent}
+.pill{min-height:38px}
+.product,.grp,.notice{overflow-wrap:anywhere}
+@media(max-width:480px){main{padding:12px}.hero{padding:16px;border-radius:18px}.card{padding:14px}.grp{flex-direction:column;align-items:flex-start;gap:4px}.grp .st,.grp .why{text-align:left}.brand h1{font-size:22px}}
+ul{padding-left:20px}footer{font-size:12px;color:var(--muted);padding:12px 2px 30px}a{color:var(--green)}
+</style>
+</head>
+<body>
+<main>
+<header class="hero"><div class="brand"><div class="leaf">🌿</div><div><h1>FODMAP Friend</h1><p>Your food-label companion · Irish &amp; UK friendly</p></div></div></header>
+
+<section class="card">
+<h2>Find a product</h2>
+<form id="searchForm"><input id="query" placeholder="Try “Tayto”, “chips”, “sausages”, or a barcode" aria-label="Product name or barcode" autocomplete="off"><button type="submit" style="width:100%">Search</button></form>
+<div class="pills" id="quickPills"></div>
+<div class="row" style="margin-top:10px"><button type="button" id="scan" class="secondary">▦ Scan barcode</button><button type="button" id="manualToggle" class="secondary">Enter barcode</button><button type="button" id="pasteToggle" class="secondary">Paste ingredients</button></div>
+<div id="cameraBox" class="hidden"><div id="reader" style="max-width:420px;margin:12px auto"></div><button id="stopScan" type="button" class="secondary">Stop camera</button><p class="muted">Camera access is required. If it doesn't work, enter the barcode manually.</p></div>
+<div id="manualBox" class="hidden"><input id="barcode" inputmode="numeric" placeholder="Barcode digits"><button id="barcodeGo" type="button">Look up barcode</button></div>
+<div id="pasteBox" class="hidden"><input id="labelName" placeholder="Product name (optional)"><textarea id="ingredients" rows="4" placeholder="Paste the full ingredients list"></textarea><button id="assess" type="button">Assess ingredients</button></div>
+<div id="status" class="status" role="status">Ready to check a product.</div><div id="results"></div>
+</section>
+
+<section id="productCard" class="card hidden"><button id="backBtn" type="button" class="secondary hidden" style="margin-bottom:12px">← Back to results</button><div id="productHead"></div><div id="typicalNote"></div><div id="verdict"></div><div id="groups"></div><div id="evidence"></div><div id="ingredientText"></div><div class="row" style="margin-top:12px"><button id="save" type="button">♡ Save product</button><a id="source" class="linkbtn secondary" href="https://world.openfoodfacts.org/" target="_blank" rel="noopener">View source</a></div></section>
+
+<section class="card">
+<h2>Irish &amp; UK favourites</h2>
+<p class="muted">A built-in guide to common products that online databases often miss. These show a <em>typical</em> recipe — always check your actual pack.</p>
+<div id="favourites"></div>
+</section>
+
+<section class="card">
+<h2>My triggers</h2>
+<p class="muted">Only some people react to every FODMAP group. Untick any you've tested and tolerate; matching ingredients will be noted but won't affect the result.</p>
+<div class="checks" id="triggerChecks"></div>
+</section>
+
+<section class="card"><h2>Saved foods <span id="savedCount" class="tag">0</span></h2><div id="savedList" class="muted">Products you save will appear here on this device.</div></section>
+
+<section class="card"><h2>How to read your result</h2>
+<p><span class="tag" style="background:#d9f1df;color:#205c35">Likely suitable</span> No obvious high-FODMAP ingredient detected. Not a guarantee.</p>
+<p><span class="tag" style="background:#fff0c9;color:#805800">Check carefully</span> An ingredient, portion size or incomplete label needs checking.</p>
+<p><span class="tag" style="background:#f8dada;color:#842c2c">Potential concern</span> One or more likely high-FODMAP ingredients were detected, or a strong one appears early in the list.</p>
+<p><span class="tag">Insufficient data</span> There isn't enough information for a useful assessment.</p></section>
+
+<section class="card"><h2>Monash University testing</h2><p class="muted">This app does not have direct access to Monash's proprietary tested-food database. It will not claim a product is Monash-tested unless evidence is supplied. Ingredient screening is not laboratory testing.</p><a href="https://www.monashfodmap.com/ibs-central/i-have-ibs/get-the-app/" target="_blank" rel="noopener">Explore the official Monash FODMAP app ↗</a></section>
+<footer>Online product information is retrieved from Open Food Facts when available. Database entries can be incomplete or out of date. Built-in guide entries are typical recipes from general knowledge, not live label data. Always check the actual package; recipes vary by country and change over time. This tool is for general information, not medical advice.</footer>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+let current=null,scanner=null,saved=[],lastResults=[],searchToken=0,fromList=false;
+const GROUPS={fructans:'Fructans',gos:'GOS (beans/pulses)',lactose:'Lactose',fructose:'Excess fructose',polyols:'Polyols'};
+let triggers={fructans:true,gos:true,lactose:true,fructose:true,polyols:true};
+try{saved=JSON.parse(localStorage.getItem('ff_saved_foods')||'[]')}catch(e){}
+try{triggers={...triggers,...JSON.parse(localStorage.getItem('ff_triggers')||'{}')}}catch(e){}
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function status(s){$('status').textContent=s}
+function toggle(id){$(id).classList.toggle('hidden')}
+
+/* ---------- Built-in Irish & UK guide (typical recipes, approximate) ---------- */
+const LOCAL=[
+ // Crisps & snacks
+ {cat:'Crisps & snacks',name:'Tayto Cheese & Onion crisps',brand:'Tayto',alias:'tayto crisps cheese and onion',ing:'Potatoes, vegetable oil (sunflower, rapeseed), cheese & onion flavour (whey powder (milk), cheese powder (milk), onion powder, sugar, flavour enhancer, yeast extract, salt)'},
+ {cat:'Crisps & snacks',name:'Tayto Ready Salted crisps',brand:'Tayto',alias:'tayto crisps plain',ing:'Potatoes, vegetable oil (sunflower, rapeseed), salt'},
+ {cat:'Crisps & snacks',name:'Tayto Salt & Vinegar crisps',brand:'Tayto',alias:'tayto crisps salt and vinegar',ing:'Potatoes, vegetable oil (sunflower, rapeseed), salt, vinegar powder, acidity regulators, flavouring',note:'Seasoning blends change between batches and countries — check for onion or garlic on your bag.'},
+ {cat:'Crisps & snacks',name:'Hunky Dorys Ready Salted crisps',brand:'Hunky Dorys',alias:'hunky dorys crisps plain',ing:'Potatoes, vegetable oil (sunflower, rapeseed), salt'},
+ {cat:'Crisps & snacks',name:'Hunky Dorys Cheese & Onion crisps',brand:'Hunky Dorys',alias:'hunky dorys crisps cheese and onion',ing:'Potatoes, vegetable oil, cheese & onion seasoning (whey powder (milk), onion powder, cheese powder (milk), sugar, salt, yeast extract, flavourings)'},
+ {cat:'Crisps & snacks',name:'King Salt & Vinegar crisps',brand:'King',alias:'king crisps salt and vinegar',ing:'Potatoes, vegetable oil, salt, vinegar powder, acidity regulator, flavouring'},
+ {cat:'Crisps & snacks',name:'Keogh\'s Sea Salt crisps',brand:"Keogh's",alias:'keoghs crisps',ing:'Potatoes, sunflower oil, sea salt'},
+ {cat:'Crisps & snacks',name:'Walkers Ready Salted crisps',brand:'Walkers',alias:'walkers crisps plain',ing:'Potatoes, sunflower oil, salt'},
+ {cat:'Crisps & snacks',name:'Pringles Original',brand:'Pringles',alias:'pringles crisps',ing:'Dehydrated potatoes, vegetable oils, maize flour, wheat starch, rice flour, emulsifier, maltodextrin, salt'},
+ // Chips & takeaway
+ {cat:'Chips & takeaway',name:'Chipper chips (plain, salt only)',brand:'Chip shop',alias:'chips fries chipper fish and chip proper chips',ing:'Potatoes, vegetable oil, salt',note:'Plain potato chips are fine for most people. Watch out for batter, curry sauce, garlic mayo and seasoning shakers.'},
+ {cat:'Chips & takeaway',name:'Oven / frozen chips (plain)',brand:'Supermarket',alias:'chips fries frozen oven chunky proper chips',ing:'Potatoes, sunflower oil, rice flour, dextrose, salt, raising agent'},
+ {cat:'Chips & takeaway',name:'Chipper curry sauce',brand:'Chip shop',alias:'curry sauce chips',ing:'Water, onion, wheat flour, sugar, curry powder, vegetable oil, garlic, salt'},
+ {cat:'Chips & takeaway',name:'Garlic mayo',brand:'Chip shop',alias:'garlic sauce dip',ing:'Rapeseed oil, water, egg yolk, spirit vinegar, sugar, salt, garlic puree'},
+ {cat:'Chips & takeaway',name:'Spice bag (takeaway)',brand:'Takeaway',alias:'spicebag chips chicken',ing:'Chips, crispy chicken (wheat flour, spices), peppers, onions, chilli, spice mix (garlic powder, onion powder, salt)'},
+ // Breakfast & meat
+ {cat:'Breakfast & meat',name:'Irish pork sausages',brand:'Typical (Denny, Superquinn, Brady\'s…)',alias:'sausages bangers breakfast sausage denny',ing:'Pork, water, rusk (wheat flour, salt), seasoning (salt, spices, herb extracts, onion powder), preservative (sulphite)',note:'Recipes vary a lot between brands — some butchers\' sausages contain no onion or garlic, so check the pack.'},
+ {cat:'Breakfast & meat',name:'Back rashers',brand:'Typical',alias:'rashers bacon breakfast',ing:'Pork, salt, sugar, preservatives (sodium nitrite, sodium nitrate), antioxidant'},
+ {cat:'Breakfast & meat',name:'White pudding',brand:'Typical',alias:'pudding breakfast clonakilty',ing:'Pork, oatmeal, onion, wheat breadcrumbs, pork fat, spices, salt'},
+ {cat:'Breakfast & meat',name:'Flahavan\'s Porridge Oats',brand:"Flahavan's",alias:'flahavans oats porridge',ing:'Wholegrain oats',note:'Oats are portion-sensitive — larger servings add up. Check the Monash app for the tested serving size.'},
+ // Bread & bakery
+ {cat:'Bread & bakery',name:'Brennans white sliced pan',brand:'Brennans',alias:'bread toast white pan',ing:'Wheat flour, water, yeast, sugar, vegetable oil, salt, soya flour, preservative, emulsifier'},
+ {cat:'Bread & bakery',name:'Irish soda bread',brand:'Typical',alias:'bread brown soda',ing:'Wholemeal wheat flour, wheat flour, buttermilk, bicarbonate of soda, salt'},
+ {cat:'Bread & bakery',name:'Barmbrack',brand:'Typical',alias:'brack halloween fruit loaf',ing:'Wheat flour, sultanas, raisins, sugar, butter, egg, tea, mixed spice, yeast'},
+ {cat:'Bread & bakery',name:'Jacob\'s Cream Crackers',brand:"Jacob's",alias:'jacobs crackers',ing:'Wheat flour, palm oil, salt, yeast, raising agent'},
+ // Dairy & sweet
+ {cat:'Dairy & sweet',name:'Kerrygold Pure Irish Butter',brand:'Kerrygold',alias:'butter',ing:'Butter, salt',note:'Butter contains very little lactose, so it is usually well tolerated.'},
+ {cat:'Dairy & sweet',name:'Fresh whole milk',brand:'Typical (Avonmore, Lakeland…)',alias:'avonmore milk dairy',ing:'Pasteurised milk'},
+ {cat:'Dairy & sweet',name:'Cadbury Dairy Milk (Irish)',brand:'Cadbury',alias:'chocolate bar',ing:'Milk, sugar, cocoa butter, cocoa mass, vegetable fats, emulsifiers, flavourings'},
+ // Sauces & tins
+ {cat:'Sauces & tins',name:'Ballymaloe Original Relish',brand:'Ballymaloe',alias:'relish sauce',ing:'Tomatoes, onions, sugar, vinegar, garlic, spices, salt'},
+ {cat:'Sauces & tins',name:'Brown sauce (HP style)',brand:'Typical',alias:'hp brown sauce',ing:'Malt vinegar, spirit vinegar, tomatoes, glucose-fructose syrup, sugar, dates, modified cornflour, rye flour, salt, spices, tamarind, flavouring'},
+ {cat:'Sauces & tins',name:'Baked beans in tomato sauce',brand:'Typical (Heinz, Batchelors…)',alias:'heinz beans',ing:'Haricot beans, tomatoes, sugar, water, spirit vinegar, modified cornflour, salt, spice extracts, herb extract'},
+ {cat:'Sauces & tins',name:'Garlic-infused olive oil',brand:'Typical (Tesco, Dunnes, SuperValu…)',alias:'garlic oil garlic infused oil flavoured tesco dunnes supervalu',ing:'Garlic infused olive oil',note:'Garlic-infused oil is a popular low-FODMAP swap for garlic. Choose one that is strained, with no garlic pieces, powder or puree in the ingredients.'},
+ {cat:'Drinks',name:'Barry\'s Gold Blend tea',brand:"Barry's",alias:'tea barrys lyons',ing:'Black tea',note:'Black tea is fine for most people; the milk you add is where lactose comes in.'}
+];
+LOCAL.forEach((p,i)=>{p.id='local-'+i});
+
+/* ---------- Ingredient assessment ---------- */
+const RULES=[
+ {id:'onion',g:['fructans'],w:2,label:'Onion family',why:'Onion, shallot and leek are rich in fructans.',re:/\b(onions?|shallots?|leeks?)\b/gi,
+  skip:(t,i)=>/spring $/i.test(t.slice(Math.max(0,i-7),i))},
+ {id:'garlic',g:['fructans'],w:2,label:'Garlic',why:'A concentrated fructan source. Garlic-infused oil (solids removed) is different.',re:/\bgarlic\b/gi,
+  skip:(t,i,m)=>/^[ -]?(?:infused |flavou?red )?(?:(?:extra virgin |virgin )?(?:olive |rapeseed |sunflower |vegetable )?)oil/i.test(t.slice(i+m.length))},
+ {id:'prebiotic',g:['fructans','gos'],w:2,label:'Added prebiotic fibre',why:'Inulin, chicory and FOS/GOS are high in fructans or GOS.',re:/\b(inulin|chicory|oligofructose|fructo-?oligosaccharides?|galacto-?oligosaccharides?|prebiotic fib(?:re|er))\b/gi},
+ {id:'wheat',g:['fructans'],w:1,label:'Wheat, rye or barley',why:'Can contribute fructans; amount and portion matter. Gluten-free alone doesn\'t decide FODMAP content.',re:/\b(wheat|rye|barley|spelt|semolina|couscous|rusk|breadcrumbs?)\b/gi,
+  skip:(t,i,m)=>/^ ?(starch|glucose|dextrose|maltodextrin|dextrin)/i.test(t.slice(i+m.length))||/^ malt/i.test(t.slice(i+m.length))},
+ {id:'lactose',g:['lactose'],w:2,label:'Concentrated lactose source',why:'Milk powder, whey powder, milk solids or added lactose.',re:/\b(milk powder|skimmed milk powder|whey powder|milk solids|lactose|condensed milk|evaporated milk)\b/gi,lf:true},
+ {id:'dairy',g:['lactose'],w:1,label:'Dairy ingredient',why:'Milk, cream, yoghurt and soft cheeses contain lactose. Butter and hard cheese are low.',re:/\b(milk|cream|yog(?:h)?urt|buttermilk|whey|custard|cottage cheese|cream cheese|ricotta|mascarpone)\b/gi,lf:true,unless:'lactose',
+  skip:(t,i)=>/(coconut|almond|oat|rice|soya|soy|hazelnut) $/i.test(t.slice(Math.max(0,i-9),i))},
+ {id:'fructose',g:['fructose'],w:2,label:'Excess fructose',why:'Honey, agave, fructose and glucose-fructose syrup can tip fructose over glucose.',re:/\b(honey|agave|high[- ]fructose|glucose[- ]fructose|fructose)\b/gi},
+ {id:'polyol',g:['polyols'],w:2,label:'Polyol sweetener',why:'Sorbitol, mannitol, maltitol, xylitol and similar sugar alcohols.',re:/\b(sorbitol|mannitol|maltitol|isomalt|xylitol|lactitol|polyols?|sugar alcohols?|e ?(?:420|421|953|965|966|967))\b/gi},
+ {id:'legume',g:['gos'],w:2,label:'Beans or pulses',why:'Chickpeas, lentils and most beans are high in GOS (small servings of some may be fine).',re:/\b(chickpeas?|lentils?|(?:kidney|baked|haricot|broad|black|butter|borlotti|cannellini) beans?|beans|split peas?|green peas?|peas|hummus|houmous)\b/gi},
+ {id:'applepear',g:['fructose','polyols'],w:2,label:'Apple or pear',why:'Contain excess fructose and sorbitol.',re:/\b(apples?|pears?)\b/gi},
+ {id:'fruitveg',g:['polyols','fructose'],w:1,label:'Portion-sensitive fruit/veg/nut',why:'Can contain polyols or excess fructose; small amounts are often fine.',re:/\b(cauliflower|mushrooms?|asparagus|artichokes?|avocado|mango|blackberr(?:y|ies)|watermelon|cherr(?:y|ies)|plums?|prunes?|peaches|peach|nectarines?|apricots?|dates|sweetcorn|pistachios?|cashews?|sultanas|raisins|currants)\b/gi}
+];
+const VAGUE=/\b(natural flavou?rings?|flavou?rings?|spices?|seasonings?|herbs? and spices|vegetable (?:powder|extract)|fruit (?:concentrate|juice)|stock|bouillon|gravy)\b/i;
+
+function assessIngredients(text,name){
+ const raw=String(text||'');
+ if(raw.trim().length<8)return {level:'gray',label:'Insufficient data',reasons:['A complete ingredient list is not available.'],ranges:[],groups:null};
+ const lower=raw.toLowerCase();
+ // "may contain" regions are ignored
+ const excl=[];let em,er=/(may contain|traces? of|produced in a factory|made in a factory)[^.]*/gi;
+ while((em=er.exec(lower)))excl.push([em.index,em.index+em[0].length]);
+ const inExcl=i=>excl.some(([a,b])=>i>=a&&i<b);
+ const lactoseFree=/lactose[- ]?free|lactofree|0% lactose/i.test(raw+' '+(name||''));
+ const items=lower.replace(/(may contain|traces? of)[^.]*/g,'').split(/,(?![^()]*\))/).map(s=>s.trim());
+ const hits=[];const done={};
+ for(const r of RULES){
+  if(r.lf&&lactoseFree)continue;
+  if(r.unless&&done[r.unless])continue;
+  const re=new RegExp(r.re.source,'gi');let m,found=[];
+  while((m=re.exec(lower))){
+   if(inExcl(m.index))continue;
+   if(r.skip&&r.skip(lower,m.index,m[0]))continue;
+   found.push([m.index,m.index+m[0].length,m[0]]);
+  }
+  if(!found.length)continue;
+  done[r.id]=true;
+  const test=new RegExp(r.re.source,'i');
+  const idx=items.findIndex(s=>test.test(s));
+  const early=idx>=0&&idx<=3;
+  const active=r.g.some(g=>triggers[g]);
+  hits.push({r,found,early,idx,active});
+ }
+ const act=hits.filter(h=>h.active),ign=hits.filter(h=>!h.active);
+ let score=0;act.forEach(h=>{score+=h.r.w+(h.early&&h.r.w>=2?1:0)+(h.idx>=0&&h.idx<=1&&h.r.id==='dairy'?2:0)});
+ const reasons=act.map(h=>h.r.label+': '+h.r.why+(h.early?' Listed near the start, so likely a larger amount.':''));
+ ign.forEach(h=>reasons.push('Not one of your selected triggers — '+h.r.label.toLowerCase()+' found.'));
+ const infused=/garlic[- ]?(?:infused |flavou?red )?(?:(?:extra virgin |virgin )?(?:olive |rapeseed |sunflower |vegetable )?)oil/i.test(lower);
+ const vague=VAGUE.test(lower);
+ let res;
+ if(score>=3)res={level:'red',label:'Potential concern'};
+ else if(score>=1)res={level:'amber',label:'Check carefully'};
+ else if(vague)res={level:'amber',label:'Check carefully'};
+ else res={level:'green',label:'Likely suitable — not verified'};
+ if(res.level==='amber'&&!act.length)reasons.unshift('Some ingredients (flavourings, spices, seasoning) are too vague to assess confidently — these often hide onion or garlic.');
+ else if(vague&&act.length)reasons.push('Vague ingredients such as flavourings or spices could also hide onion or garlic.');
+ if(infused&&triggers.fructans)reasons.unshift('Garlic-infused oil: fructans don\'t dissolve in oil, so oil infused with garlic (and strained) is generally considered low FODMAP. Check it contains no garlic pieces, powder or puree.');
+ if(res.level==='green'){reasons.unshift('No obvious high-FODMAP ingredient was detected by this basic label screen.');reasons.push('This does not prove low-FODMAP status. Portion size, processing and ingredient quantities can change the result.')}
+ const ranges=act.flatMap(h=>h.found.map(f=>[f[0],f[1],h.r.w>=2?'red':'amber']));
+ const groups={};
+ Object.keys(GROUPS).forEach(g=>{
+  const hs=hits.filter(h=>h.r.g.includes(g));
+  const words=[...new Set(hs.flatMap(h=>h.found.map(f=>f[2].toLowerCase())))].slice(0,5);
+  if(!triggers[g])groups[g]={level:'gray',text:'Not tracking',words:[]};
+  else if(hs.some(h=>h.r.w>=2||(h.idx>=0&&h.idx<=1&&h.r.id==='dairy')))groups[g]={level:'red',text:'Likely present',words};
+  else if(hs.length)groups[g]={level:'amber',text:'Possible',words};
+  else if(g==='fructans'&&vague)groups[g]={level:'amber',text:'Unclear',words:['vague flavourings/spices']};
+  else groups[g]={level:'green',text:'Not detected',words:[]};
+ });
+ return {...res,reasons,ranges,groups};
+}
+function highlight(text,ranges){
+ const rs=[...ranges].sort((a,b)=>a[0]-b[0]);const merged=[];
+ rs.forEach(r=>{const l=merged[merged.length-1];if(l&&r[0]<=l[1]){l[1]=Math.max(l[1],r[1]);if(r[2]==='red')l[2]='red'}else merged.push([...r])});
+ let out='',pos=0;
+ merged.forEach(([a,b,c])=>{out+=esc(text.slice(pos,a))+'<mark class="hl hl-'+(c||'amber')+'">'+esc(text.slice(a,b))+'</mark>';pos=b});
+ return out+esc(text.slice(pos));
+}
+
+/* ---------- Product display ---------- */
+function showProduct(p,fromListFlag){
+ fromList=!!fromListFlag;
+ const ingredients=p.ingredients_text||p.ingredients_text_en||p.ing||'';
+ const name=p.product_name||p.product_name_en||p.generic_name||p.name||'Unnamed product';
+ current={code:p.code||'',name,brand:p.brands||p.brand||'',ingredients,typical:!!p.typical,note:p.note||'',
+  result:assessIngredients(ingredients,name),
+  url:p.url||(p.code?'https://world.openfoodfacts.org/product/'+p.code:'https://world.openfoodfacts.org/'),
+  image:p.image_front_small_url||''};
+ renderProduct();
+}
+const GROUPINFO={fructans:['Fructans','Oligosaccharides'],gos:['GOS','Oligosaccharides'],lactose:['Lactose','Disaccharides'],fructose:['Excess fructose','Monosaccharides'],polyols:['Polyols','Sorbitol, mannitol & co.']};
+function groupsHTML(r){
+ if(!r.groups)return '';
+ return '<h3>FODMAP breakdown</h3>'+Object.keys(GROUPINFO).map(g=>{const x=r.groups[g],i=GROUPINFO[g];
+  return '<div class="grp '+x.level+'"><div><b>'+esc(i[0])+'</b><small>'+esc(i[1])+'</small></div><div><div class="st">'+esc(x.text)+'</div>'+(x.words.length?'<div class="why">'+esc(x.words.join(', '))+'</div>':'')+'</div></div>'}).join('')+'<p class="muted">Green = nothing found, yellow = possible or portion-dependent, red = likely present, grey = switched off in My triggers. “Not detected” isn\'t proof — hidden ingredients and quantities can\'t be seen from a label.</p>';
+}
+function renderProduct(){
+ const p=current;if(!p)return;
+ p.result=assessIngredients(p.ingredients,p.name);
+ $('productCard').classList.remove('hidden');
+ $('productHead').innerHTML=(p.image?'<img alt="" src="'+esc(p.image)+'" style="width:68px;height:68px;object-fit:contain;float:left;margin-right:12px">':'')+'<strong style="font-size:20px">'+esc(p.name)+'</strong><div class="muted">'+esc(p.brand||'Brand not listed')+'</div><div class="muted">'+(p.code?'Barcode: '+esc(p.code):p.typical?'Built-in guide entry':'Manual ingredient check')+'</div><div style="clear:both"></div>';
+ $('backBtn').classList.toggle('hidden',!fromList||!lastResults.length);
+ $('typicalNote').innerHTML=p.typical?'<div class="notice"><strong>Typical recipe.</strong> This is a general guide, not a live label. Compare with your pack.'+(p.note?'<br>'+esc(p.note):'')+'</div>':'';
+ const r=p.result;
+ $('verdict').innerHTML='<div class="result '+r.level+'"><strong style="font-size:19px">'+esc(r.label)+'</strong><div style="font-size:13px;margin-top:4px">Ingredient-screening result · Not Monash-verified</div></div>';
+ $('groups').innerHTML=groupsHTML(r);
+ $('evidence').innerHTML='<ul>'+r.reasons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+ $('ingredientText').innerHTML='<strong>Ingredients'+(p.typical?' (typical)':' listed')+'</strong><p class="muted" style="white-space:pre-wrap">'+(p.ingredients?highlight(p.ingredients,r.ranges||[]):'No ingredient list found in the database.')+'</p>';
+ $('source').classList.toggle('hidden',!!p.typical);
+ $('source').href=p.url;
+ $('save').textContent=saved.some(x=>x.key===key(p))||saved.some(x=>key(x)===key(p))?'✓ Saved':'♡ Save product';
+ $('productCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function key(p){return (p.code||'')+'|'+p.name}
+
+/* ---------- Online lookups (Open Food Facts) ---------- */
+const FIELDS='code,product_name,generic_name,brands,ingredients_text,ingredients_text_en,image_front_small_url,countries_tags';
+async function getJSON(url,ms){
+ const c=new AbortController();const t=setTimeout(()=>c.abort(),ms||9000);
+ try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error('http');return await r.json()}finally{clearTimeout(t)}
+}
+async function lookupBarcode(code){
+ code=String(code||'').replace(/\D/g,'');if(!code){status('Enter a barcode first.');return}
+ status('Looking up barcode…');$('productCard').classList.add('hidden');
+ try{const d=await getJSON('https://world.openfoodfacts.org/api/v3/product/'+encodeURIComponent(code)+'.json');if(d.status!=='success'&&d.status!==1)throw Error();if(!d.product)throw Error();d.product.code=d.product.code||code;d.product.url='https://world.openfoodfacts.org/product/'+d.product.code;showProduct(d.product);status('Product found. Confirm the ingredients match your package.')}
+ catch(e){status('Product not found or database unavailable. Try a product-name search or paste its ingredients.')}
+}
+// Plain-English helpers so "chips" finds chips (fries), not just crisps
+const SYN=[
+ [/\b(proper |chipper |fish and |fish & )?chips\b/,['oven chips','frozen chips','chunky chips','fries']],
+ [/\bfries\b/,['chips','oven chips']],
+ [/\bcrisps?\b/,['crisps']],
+ [/\b(bangers?|sausages?)\b/,['pork sausages','irish sausages']],
+ [/\b(rashers?|bacon)\b/,['back bacon','rashers']],
+ [/\bpudding\b/,['white pudding','black pudding']],
+ [/\bgarlic (infused |flavou?red )?oil\b/,['garlic infused oil','garlic flavoured oil','garlic olive oil']],
+ [/\bspice ?bag\b/,['spice bag','chicken fillet roll']]
+];
+const RETAILERS=/\b(tesco|dunnes( stores)?|super ?valu|aldi|lidl|sainsbury'?s|asda|morrisons|waitrose|m&s|marks (and|&) spencer|centra|spar|iceland|co-?op)\b/gi;
+function stripRetailer(q){return q.replace(RETAILERS,' ').replace(/\s+/g,' ').trim()}
+function expandQueries(q){
+ const base=stripRetailer(q);
+ const out=[q];if(base&&base.toLowerCase()!==q.toLowerCase())out.push(base);
+ const l=(base||q).toLowerCase();
+ SYN.forEach(([re,alts])=>{if(re.test(l))alts.forEach(a=>{if(!out.includes(a))out.push(a)})});
+ return out.slice(0,5);
+}
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+async function fetchRetry(url){
+ for(let a=0;a<2;a++){try{return await getJSON(url,7000)}catch(e){if(a===0)await new Promise(r=>setTimeout(r,700))}}
+ return null;
+}
+async function pool(thunks,n){
+ const out=[];let i=0;
+ await Promise.all(Array.from({length:Math.min(n,thunks.length)},async()=>{while(i<thunks.length){const k=i++;out[k]=await thunks[k]()}}));
+ return out;
+}
+// Requests are throttled (3 at a time) and staged: the likeliest matches first, the rest after.
+function onlineStages(q){
+ const qs=expandQueries(q),enc=encodeURIComponent;
+ const primary=qs.length>1?qs[1]:qs[0];
+ const base=stripRetailer(q)||q,b=slug(base),short=base.split(/\s+/).length<=2;
+ const S=(host,term)=>()=>fetchRetry('https://'+host+'.openfoodfacts.org/cgi/search.pl?search_terms='+enc(term)+'&search_simple=1&action=process&json=1&page_size=12&sort_by=unique_scans_n&fields='+FIELDS);
+ const B=c=>()=>fetchRetry('https://world.openfoodfacts.org/api/v2/search?brands_tags='+enc(b)+(c?'&countries_tags_en='+c:'')+'&page_size=12&sort_by=unique_scans_n&fields='+FIELDS);
+ const st1=[S('ie',primary),S('uk',primary)];if(b&&short)st1.push(B('ireland'));
+ const st2=[];
+ qs.filter(t=>t!==primary&&t!==q).forEach(t=>{st2.push(S('ie',t));st2.push(S('uk',t))});
+ st2.push(S('world',primary));
+ if(b&&short){st2.push(B('united-kingdom'));st2.push(B(''))}
+ return [st1,st2];
+}
+function localSearch(q){
+ const toks=stripRetailer(q).toLowerCase().split(/\s+/).filter(Boolean);
+ return LOCAL.filter(p=>{const h=(p.name+' '+p.brand+' '+p.alias+' '+p.cat).toLowerCase();return toks.every(t=>h.includes(t))||SYNLOCAL(q,p)});
+}
+function SYNLOCAL(q,p){
+ const l=q.toLowerCase();const h=(p.alias+' '+p.name).toLowerCase();
+ return expandQueries(l).slice(1).some(a=>h.includes(a));
+}
+function countryRank(p){const c=p.countries_tags||[];if(c.includes('en:ireland'))return 0;if(c.includes('en:united-kingdom'))return 1;return 2}
+function resultHTML(items){
+ return items.map((p,i)=>{
+  const badge=p._local?'<span class="badge guide">Built-in guide</span>':countryRank(p)===0?'<span class="badge">🇮🇪 Ireland</span>':countryRank(p)===1?'<span class="badge">🇬🇧 UK</span>':'';
+  return '<button type="button" class="product" data-p="'+i+'">'+(p.image_front_small_url?'<img src="'+esc(p.image_front_small_url)+'" alt="">':'')+'<strong>'+esc(p.product_name||p.name)+'</strong>'+badge+'<div class="muted">'+esc(p.brands||p.brand||'Brand unknown')+(p._local?'':' · '+esc(p.code||'No barcode'))+((p._local||p.ingredients_text||p.ingredients_text_en)?'':'<span class="noing">no ingredients listed yet</span>')+'</div><div style="clear:both"></div></button>';
+ }).join('');
+}
+function bindResults(){
+ $('results').querySelectorAll('[data-p]').forEach(b=>b.addEventListener('click',async()=>{
+  const p=lastResults[+b.dataset.p];
+  if(!p._local){p.url='https://world.openfoodfacts.org/product/'+(p.code||'');
+   if(!(p.ingredients_text||p.ingredients_text_en)&&p.code){status('Fetching full product details…');
+    try{const d=await getJSON('https://world.openfoodfacts.org/api/v3/product/'+encodeURIComponent(p.code)+'.json',8000);if(d.product){p.ingredients_text=d.product.ingredients_text||d.product.ingredients_text_en||''}}catch(e){}}}
+  showProduct(p,true);
+  status(p._local?'Built-in guide entry. Compare with your pack.':'Selected product. Check its ingredients on the packet.');
+  $('results').innerHTML='';
+ }));
+}
+function cacheGet(k){try{return (JSON.parse(localStorage.getItem('ff_search_cache')||'{}')[k])||null}catch(e){return null}}
+function cacheSet(k,list){try{const c=JSON.parse(localStorage.getItem('ff_search_cache')||'{}');c[k]=list.slice(0,12);const keys=Object.keys(c);if(keys.length>15)delete c[keys[0]];localStorage.setItem('ff_search_cache',JSON.stringify(c))}catch(e){}}
+async function searchProduct(){
+ const q=$('query').value.trim();if(!q){status('Enter a product name or barcode.');return}
+ if(/^\d{7,14}$/.test(q)){lookupBarcode(q);return}
+ const token=++searchToken;const sb=$('searchForm').querySelector('button');sb.disabled=true;sb.textContent='Searching…';
+ $('productCard').classList.add('hidden');fromList=false;
+ const ck=q.toLowerCase();
+ const loc=localSearch(q).map(p=>({...p,_local:true,typical:true}));
+ const cached=cacheGet(ck)||[];
+ const seen=new Set(),online=[];let ok=0;
+ const add=p=>{if(!(p.product_name||p.generic_name))return;p.product_name=p.product_name||p.generic_name;const k=p.code||p.product_name+(p.brands||'');if(seen.has(k))return;seen.add(k);online.push(p)};
+ const rank=p=>countryRank(p)*2+(p.ingredients_text||p.ingredients_text_en?0:1);
+ const render=()=>{online.sort((a,b)=>rank(a)-rank(b));lastResults=[...loc,...online.slice(0,14)];$('results').innerHTML=resultHTML(lastResults);bindResults()};
+ cached.forEach(add);render();
+ status(cached.length?'Showing your earlier results while refreshing…':'Searching Irish, UK and world databases…');
+ try{
+  const stages=onlineStages(q);
+  for(let n=0;n<stages.length;n++){
+   const vals=await pool(stages[n],3);
+   if(token!==searchToken)return;
+   vals.forEach(v=>{if(v){ok++;(v.products||[]).forEach(add)}});
+   render();
+   if(n===0&&online.length)status('Found some matches — checking for more…');
+  }
+ }finally{if(token===searchToken){sb.disabled=false;sb.textContent='Search'}}
+ if(token!==searchToken)return;
+ if(online.length)cacheSet(ck,online);
+ if(!lastResults.length){
+  $('results').innerHTML='';
+  status(ok?'No matching products found. Try a brand name, a barcode, or paste the ingredients.':'Couldn\'t reach the product database just now — it can be busy. Tap Search to try again, or paste the ingredients instead.');
+  return;
+ }
+ status((ok?'':'Online search is unavailable right now, so some results may be missing. Tap Search to retry. ')+'Choose the product matching your package.');
+}
+
+/* ---------- UI wiring ---------- */
+$('searchForm').addEventListener('submit',e=>{e.preventDefault();searchProduct()});
+$('backBtn').addEventListener('click',()=>{
+ $('productCard').classList.add('hidden');fromList=false;
+ $('results').innerHTML=resultHTML(lastResults);bindResults();
+ status('Choose the product matching your package.');
+ $('results').scrollIntoView({behavior:'smooth',block:'start'});
+});
+$('manualToggle').addEventListener('click',()=>toggle('manualBox'));$('pasteToggle').addEventListener('click',()=>toggle('pasteBox'));
+$('barcodeGo').addEventListener('click',()=>lookupBarcode($('barcode').value));
+$('barcode').addEventListener('keydown',e=>{if(e.key==='Enter')lookupBarcode(e.target.value)});
+$('assess').addEventListener('click',()=>{const ingredients=$('ingredients').value.trim();if(!ingredients){status('Paste an ingredient list first.');return}showProduct({product_name:$('labelName').value.trim()||'Manually entered product',ingredients_text:ingredients});status('Label screened. Check the full package and serving size.')});
+
+['Tayto','Hunky Dorys','Chips','Crisps','Sausages','Rashers','Brown sauce','Kerrygold','Barry\'s tea'].forEach(t=>{
+ const b=document.createElement('button');b.type='button';b.className='pill';b.textContent=t;
+ b.addEventListener('click',()=>{$('query').value=t;searchProduct()});$('quickPills').appendChild(b);
+});
+
+(function buildFavourites(){
+ const cats={};LOCAL.forEach(p=>{(cats[p.cat]=cats[p.cat]||[]).push(p)});
+ $('favourites').innerHTML=Object.keys(cats).map(c=>'<details><summary>'+esc(c)+' <span class="tag">'+cats[c].length+'</span></summary><div class="pills">'+cats[c].map(p=>'<button type="button" class="pill" data-fav="'+p.id+'">'+esc(p.name)+'</button>').join('')+'</div></details>').join('');
+ $('favourites').querySelectorAll('[data-fav]').forEach(b=>b.addEventListener('click',()=>{
+  const p=LOCAL.find(x=>x.id===b.dataset.fav);showProduct({...p,typical:true});status('Built-in guide entry. Compare with your pack.');
+ }));
+})();
+
+(function buildTriggers(){
+ $('triggerChecks').innerHTML=Object.keys(GROUPS).map(g=>'<label><input type="checkbox" data-g="'+g+'" '+(triggers[g]?'checked':'')+'>'+esc(GROUPS[g])+'</label>').join('');
+ $('triggerChecks').querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>{
+  triggers[i.dataset.g]=i.checked;
+  try{localStorage.setItem('ff_triggers',JSON.stringify(triggers))}catch(e){}
+  if(current&&!$('productCard').classList.contains('hidden'))renderProduct();
+  renderSaved();
+ }));
+})();
+
+$('save').addEventListener('click',()=>{if(!current)return;const i=saved.findIndex(x=>key(x)===key(current));if(i>=0)saved.splice(i,1);else saved.unshift({...current});try{localStorage.setItem('ff_saved_foods',JSON.stringify(saved))}catch(e){}renderProduct();renderSaved()});
+function renderSaved(){
+ $('savedCount').textContent=saved.length;
+ if(!saved.length){$('savedList').innerHTML='<div class="muted">Products you save will appear here on this device.</div>';return}
+ $('savedList').innerHTML=saved.map((p,i)=>{const r=assessIngredients(p.ingredients,p.name);return '<div class="product lvl-'+r.level+'"><strong>'+esc(p.name)+'</strong><div class="muted">'+esc(p.brand||'')+' · '+esc(r.label)+'</div><div class="row" style="margin-top:8px"><button type="button" class="secondary" data-open="'+i+'">View</button><button type="button" class="secondary" data-remove="'+i+'">Remove</button></div></div>'}).join('');
+ $('savedList').querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{current=saved[+b.dataset.open];fromList=false;renderProduct()}));
+ $('savedList').querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{saved.splice(+b.dataset.remove,1);try{localStorage.setItem('ff_saved_foods',JSON.stringify(saved))}catch(e){}renderSaved()}));
+}renderSaved();
+
+/* ---------- Barcode scanner ---------- */
+async function stopScan(){if(scanner){try{if(scanner.isScanning)await scanner.stop();scanner.clear()}catch(e){}scanner=null}$('cameraBox').classList.add('hidden')}
+$('stopScan').addEventListener('click',stopScan);
+$('scan').addEventListener('click',async()=>{
+ $('cameraBox').classList.remove('hidden');status('Starting camera…');
+ try{if(!window.Html5Qrcode){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+ scanner=new Html5Qrcode('reader');const cams=await Html5Qrcode.getCameras();if(!cams.length)throw Error('No camera');const cam=cams.find(c=>/back|rear|environment/i.test(c.label))||cams[cams.length-1];
+ await scanner.start(cam.id,{fps:10,qrbox:{width:260,height:120},formatsToSupport:[Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.UPC_E,Html5QrcodeSupportedFormats.CODE_128]},txt=>{stopScan();$('barcode').value=txt;lookupBarcode(txt)},()=>{});status('Point your camera at the barcode.');
+ }catch(e){status('Camera unavailable. Allow camera access or use Enter barcode.')}
+});
+</script>
+</body>
+</html>
